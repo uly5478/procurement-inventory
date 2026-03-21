@@ -1,0 +1,36 @@
+# Kiro IDE
+.kiro/
+
+# VS Code
+.vscode/
+
+# .NET build outputs
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+# NuGet
+*.nupkg
+packages/
+
+# ASP.NET
+appsettings.Development.json
+
+# Documentation (may contain sensitive info)
+doc/
+
+# Node.js
+node_modules/
+dist/
+.env
+.env.local
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db

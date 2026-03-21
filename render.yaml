@@ -1,0 +1,43 @@
+databases:
+  - name: procurement-db
+    databaseName: procurement_inventory
+    user: procurement_user
+    plan: free
+
+services:
+  # ── 後端 ASP.NET Core Web API ─────────────────────────────────────────────
+  - type: web
+    name: procurement-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: procurement-db
+          property: connectionString
+      - key: JwtSettings__SecretKey
+        generateValue: true
+      - key: JwtSettings__Issuer
+        value: ProcurementInventory
+      - key: JwtSettings__Audience
+        value: ProcurementInventoryUsers
+      - key: Cors__AllowedOrigins__0
+        value: https://procurement-frontend.onrender.com  # 部署後改為實際前端 URL
+
+  # ── 前端 React Static Site ────────────────────────────────────────────────
+  - type: web
+    name: procurement-frontend
+    runtime: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    rootDir: frontend
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://procurement-api.onrender.com/api  # 部署後改為實際後端 URL
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

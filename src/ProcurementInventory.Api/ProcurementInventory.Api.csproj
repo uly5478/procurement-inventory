@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>ProcurementInventory.Api</RootNamespace>
+    <AssemblyName>ProcurementInventory.Api</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Entity Framework Core + PostgreSQL -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.1">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+
+    <!-- JWT Authentication -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
+
+    <!-- Swagger / OpenAPI -->
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.1" />
+
+    <!-- Excel Export -->
+    <PackageReference Include="EPPlus" Version="7.6.3" />
+  </ItemGroup>
+
+</Project>
