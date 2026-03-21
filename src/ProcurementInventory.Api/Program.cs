@@ -19,8 +19,17 @@ builder.Services.AddControllers()
     });
 
 // ── Entity Framework Core + PostgreSQL ───────────────────────────────────────
+// Render 注入的 connection string 可能是 postgres:// URL 格式，需要轉換
+var rawConnStr = builder.Configuration.GetConnectionString("DefaultConnection") ?? "";
+if (rawConnStr.StartsWith("postgres://") || rawConnStr.StartsWith("postgresql://"))
+{
+    var uri = new Uri(rawConnStr);
+    var userInfo = uri.UserInfo.Split(':');
+    rawConnStr = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+}
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(rawConnStr));
 
 // ── JWT Authentication ────────────────────────────────────────────────────────
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
