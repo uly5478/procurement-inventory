@@ -60,7 +60,7 @@ export default function MainLayout({ isDark, toggleTheme }: MainLayoutProps) {
         />
         {/* 主題切換 — 絕對定位在 Sider 最底部 */}
         <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0,
+          position: 'absolute', bottom: 24, left: 0, right: 0,
           padding: '12px 16px',
           borderTop: '1px solid rgba(255,255,255,0.1)',
           background: '#001529',
