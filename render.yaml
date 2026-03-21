@@ -25,7 +25,7 @@ services:
       - key: JwtSettings__Audience
         value: ProcurementInventoryUsers
       - key: Cors__AllowedOrigins__0
-        value: https://procurement-frontend.onrender.com  # 部署後改為實際前端 URL
+        value: https://procurement-frontend-qw30.onrender.com
 
   # ── 前端 React Static Site ────────────────────────────────────────────────
   - type: web
@@ -36,7 +36,7 @@ services:
     rootDir: frontend
     envVars:
       - key: VITE_API_BASE_URL
-        value: https://procurement-api.onrender.com/api  # 部署後改為實際後端 URL
+        value: https://procurement-api-zz7w.onrender.com/api
     routes:
       - type: rewrite
         source: /*
