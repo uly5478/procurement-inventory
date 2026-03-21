@@ -43,7 +43,7 @@ export default function MainLayout({ isDark, toggleTheme }: MainLayoutProps) {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sider width={200} theme="dark" style={{ display: 'flex', flexDirection: 'column' }}>
+      <Sider width={200} theme="dark" style={{ position: 'relative' }}>
         <div style={{
           height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center',
           color: '#fff', fontWeight: 'bold', fontSize: 14,
@@ -57,10 +57,14 @@ export default function MainLayout({ isDark, toggleTheme }: MainLayoutProps) {
           selectedKeys={[selectedKey]}
           items={menuItems}
           onClick={({ key }) => navigate(key)}
-          style={{ flex: 1 }}
         />
-        {/* 深色/淺色切換按鈕 — 左下角 */}
-        <div style={{ padding: '12px 16px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+        {/* 主題切換 — 絕對定位在 Sider 最底部 */}
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0,
+          padding: '12px 16px',
+          borderTop: '1px solid rgba(255,255,255,0.1)',
+          background: '#001529',
+        }}>
           <Button
             block
             icon={isDark ? <BulbFilled /> : <BulbOutlined />}
