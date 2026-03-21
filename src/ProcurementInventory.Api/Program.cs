@@ -113,6 +113,13 @@ builder.Services.AddScoped<IDemandForecastService, DemandForecastService>();
 
 var app = builder.Build();
 
+// ── Auto Migration ────────────────────────────────────────────────────────────
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+}
+
 // ── Middleware Pipeline ───────────────────────────────────────────────────────
 app.UseGlobalExceptionHandler();
 
