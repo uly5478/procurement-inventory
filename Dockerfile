@@ -1,4 +1,5 @@
 # ── Build stage ──────────────────────────────────────────────────────────────
+# cache-bust: 2026-03-21
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /app
 
