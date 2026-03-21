@@ -17,12 +17,17 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
   return token ? <>{children}</> : <Navigate to="/login" replace />
 }
 
-export default function App() {
+interface AppProps {
+  isDark: boolean
+  toggleTheme: () => void
+}
+
+export default function App({ isDark, toggleTheme }: AppProps) {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/" element={<RequireAuth><MainLayout /></RequireAuth>}>
+        <Route path="/" element={<RequireAuth><MainLayout isDark={isDark} toggleTheme={toggleTheme} /></RequireAuth>}>
           <Route index element={<Navigate to="/products" replace />} />
           <Route path="products" element={<ProductsPage />} />
           <Route path="products/:id/suppliers" element={<SupplierPricePage />} />
