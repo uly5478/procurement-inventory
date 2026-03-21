@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Table, Button, Space, Tag, message, Tooltip } from 'antd'
+import { Table, Button, Space, Tag, message, Tooltip, theme } from 'antd'
 import { DownloadOutlined, WarningOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import { useNavigate } from 'react-router-dom'
@@ -10,6 +10,8 @@ export default function InventoryPage() {
   const [data, setData] = useState<InventoryOverview[]>([])
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+  const { token: colorToken } = theme.useToken()
+  const isDark = colorToken.colorBgContainer === '#141414' || colorToken.colorBgBase === '#000'
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -100,7 +102,7 @@ export default function InventoryPage() {
       width: 100,
       render: (status: string) =>
         status === 'Low' ? (
-          <Tag color="warning">庫存不足</Tag>
+          <Tag color="warning" style={{ color: '#7c4a00' }}>庫存不足</Tag>
         ) : (
           <Tag color="success">正常</Tag>
         ),
@@ -132,7 +134,7 @@ export default function InventoryPage() {
         rowClassName={(record) => (record.stockStatus === 'Low' ? 'row-low-stock' : '')}
         pagination={{ pageSize: 20, showSizeChanger: false }}
       />
-      <style>{`.row-low-stock td { background-color: #fffbe6 !important; }`}</style>
+      <style>{`.row-low-stock td { background-color: ${isDark ? 'rgba(250,173,20,0.08)' : '#fffbe6'} !important; }`}</style>
     </div>
   )
 }
