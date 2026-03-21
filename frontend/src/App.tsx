@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import MainLayout from './layouts/MainLayout'
+import LoginPage from './pages/auth/LoginPage'
 import ProductsPage from './pages/products/ProductsPage'
 import SupplierPricePage from './pages/suppliers/SupplierPricePage'
 import SuggestionsPage from './pages/procurement/SuggestionsPage'
@@ -9,12 +10,19 @@ import StockInPage from './pages/inventory/StockInPage'
 import StockOutPage from './pages/inventory/StockOutPage'
 import InventoryHistoryPage from './pages/inventory/InventoryHistoryPage'
 import ForecastPage from './pages/forecast/ForecastPage'
+import useAuthStore from './store/authStore'
+
+function RequireAuth({ children }: { children: React.ReactNode }) {
+  const token = useAuthStore((s) => s.token)
+  return token ? <>{children}</> : <Navigate to="/login" replace />
+}
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<MainLayout />}>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/" element={<RequireAuth><MainLayout /></RequireAuth>}>
           <Route index element={<Navigate to="/products" replace />} />
           <Route path="products" element={<ProductsPage />} />
           <Route path="products/:id/suppliers" element={<SupplierPricePage />} />

@@ -1,5 +1,7 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
-import { Layout, Menu } from 'antd'
+import { Layout, Menu, Button } from 'antd'
+import { LogoutOutlined } from '@ant-design/icons'
+import useAuthStore from '../store/authStore'
 import {
   AppstoreOutlined,
   CalculatorOutlined,
@@ -53,6 +55,12 @@ const menuItems = [
 export default function MainLayout() {
   const navigate = useNavigate()
   const { pathname } = useLocation()
+  const { user, clearToken } = useAuthStore()
+
+  const handleLogout = () => {
+    clearToken()
+    navigate('/login', { replace: true })
+  }
 
   // Match the most specific menu key
   const selectedKey =
@@ -87,8 +95,12 @@ export default function MainLayout() {
         />
       </Sider>
       <Layout>
-        <Header style={{ background: '#fff', padding: '0 24px', borderBottom: '1px solid #f0f0f0' }}>
+        <Header style={{ background: '#fff', padding: '0 24px', borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ fontWeight: 500 }}>採購下單及庫存管理系統</span>
+          <span>
+            <span style={{ marginRight: 16, color: '#666' }}>{user?.displayName}</span>
+            <Button icon={<LogoutOutlined />} onClick={handleLogout} size="small">登出</Button>
+          </span>
         </Header>
         <Content style={{ margin: 24, background: '#fff', padding: 24, borderRadius: 8 }}>
           <Outlet />
