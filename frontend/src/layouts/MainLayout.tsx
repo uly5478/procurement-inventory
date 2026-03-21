@@ -2,7 +2,6 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { Layout, Menu } from 'antd'
 import {
   AppstoreOutlined,
-  ShopOutlined,
   CalculatorOutlined,
   FileTextOutlined,
   DatabaseOutlined,
