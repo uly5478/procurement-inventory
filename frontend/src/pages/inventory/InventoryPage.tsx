@@ -3,7 +3,7 @@ import { Table, Button, Space, message, Tooltip, theme, Modal, Tag, Typography }
 import { DownloadOutlined, WarningOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import { useNavigate } from 'react-router-dom'
-import { getInventoryOverview, getExportUrl } from '../../api/inventory'
+import { getInventoryOverview } from '../../api/inventory'
 import type { InventoryOverview } from '../../api/inventory'
 import { getMonthlyInventory } from '../../api/monthlyInventory'
 import type { MonthlyInventory } from '../../types'

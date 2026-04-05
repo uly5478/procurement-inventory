@@ -91,7 +91,7 @@ function calcMonthlyOrders(
 export default function SuggestionsPage() {
   const [suggestions, setSuggestions] = useState<ProcurementSuggestion[]>([])
   const [loading, setLoading] = useState(false)
-  const [settings, setSettings] = useState<ProcurementSettings | null>(null)  // eslint-disable-line
+  const [, setSettings] = useState<ProcurementSettings | null>(null)
   const navigate = useNavigate()
 
   // 選択中の回転率（フロントエンドで管理）
