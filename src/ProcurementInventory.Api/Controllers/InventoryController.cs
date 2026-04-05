@@ -81,14 +81,14 @@ public class InventoryController : ControllerBase
     }
 
     /// <summary>
-    /// 匯出庫存總覽 Excel（需求 7.5）
+    /// 匯出庫存總覽 Excel（需求 7.5, 9.1, 9.2）
     /// </summary>
     [HttpGet("export")]
     public async Task<IActionResult> ExportExcel()
     {
-        var overview = await _service.GetInventoryOverviewAsync();
-        var bytes = _excelService.ExportInventoryOverview(overview);
-        var fileName = $"庫存總覽_{DateTime.Now:yyyyMMdd_HHmm}.xlsx";
+        var overview = await _service.GetInventoryOverviewExtendedAsync();
+        var bytes = _excelService.ExportInventoryOverviewExtended(overview);
+        var fileName = $"inventory_export_{DateTime.Now:yyyy-MM-dd}.xlsx";
         return File(bytes,
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             fileName);

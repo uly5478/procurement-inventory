@@ -32,7 +32,7 @@ export default function InventoryHistoryPage() {
       setHistory(hist)
       setMonthly(mon)
     } catch {
-      message.error('載入庫存歷程失敗')
+      message.error('在庫履歴の読み込みに失敗しました')
     } finally {
       setLoading(false)
     }
@@ -44,14 +44,14 @@ export default function InventoryHistoryPage() {
 
   const columns: ColumnsType<StockTransactionHistory> = [
     {
-      title: '異動日期',
+      title: '取引日',
       dataIndex: 'transactionDate',
       key: 'transactionDate',
       width: 160,
       render: (v: string) => dayjs(v).format('YYYY-MM-DD HH:mm'),
     },
     {
-      title: '類型',
+      title: '種別',
       dataIndex: 'transactionType',
       key: 'transactionType',
       width: 80,
@@ -60,34 +60,34 @@ export default function InventoryHistoryPage() {
       ),
     },
     {
-      title: '數量',
+      title: '数量',
       dataIndex: 'quantity',
       key: 'quantity',
       width: 90,
       align: 'right',
     },
     {
-      title: '異動前庫存',
+      title: '取引前在庫',
       dataIndex: 'stockBefore',
       key: 'stockBefore',
       width: 110,
       align: 'right',
     },
     {
-      title: '異動後庫存',
+      title: '取引後在庫',
       dataIndex: 'stockAfter',
       key: 'stockAfter',
       width: 110,
       align: 'right',
     },
     {
-      title: '操作人員',
+      title: '担当者',
       dataIndex: 'operatorAccount',
       key: 'operatorAccount',
       width: 120,
     },
     {
-      title: '備註',
+      title: '備考',
       dataIndex: 'remark',
       key: 'remark',
     },
@@ -95,7 +95,6 @@ export default function InventoryHistoryPage() {
 
   return (
     <div style={{ padding: 24 }}>
-      {/* 每月出貨統計 */}
       {monthly.length > 0 && (
         <Row gutter={16} style={{ marginBottom: 24 }}>
           {monthly.map((m) => (
@@ -104,7 +103,7 @@ export default function InventoryHistoryPage() {
                 <Statistic
                   title={`${m.year}/${String(m.month).padStart(2, '0')}`}
                   value={m.totalShipped}
-                  suffix="件"
+                  suffix="個"
                 />
               </Card>
             </Col>
@@ -112,13 +111,12 @@ export default function InventoryHistoryPage() {
         </Row>
       )}
 
-      {/* 篩選 */}
       <Space style={{ marginBottom: 16 }}>
         <RangePicker
           onChange={(val) =>
             setDateRange(val as [dayjs.Dayjs | null, dayjs.Dayjs | null] | null)
           }
-          placeholder={['開始日期', '結束日期']}
+          placeholder={['開始日', '終了日']}
         />
       </Space>
 

@@ -11,7 +11,7 @@ public interface IProductRepository
     /// 查詢產品清單，支援關鍵字模糊搜尋與 isActive 篩選。
     /// isActive=true（預設）只回傳啟用產品；isActive=false 只回傳停用；isActive=null 回傳全部。
     /// </summary>
-    Task<IEnumerable<Product>> GetAllAsync(string? keyword, bool? isActive);
+    Task<IEnumerable<Product>> GetAllAsync(string? keyword, bool? isActive, string? categoryCode = null);
 
     /// <summary>依 Id 取得產品</summary>
     Task<Product?> GetByIdAsync(int id);

@@ -29,23 +29,22 @@ export default function StockOutPage() {
         forceConfirm,
       })
 
-      // 超庫存警告，需要使用者確認
       if (result.requireConfirmation) {
         Modal.confirm({
-          title: '庫存不足警告',
+          title: '在庫不足の警告',
           icon: <WarningOutlined style={{ color: '#faad14' }} />,
           content: result.warning,
-          okText: '確認出貨',
-          cancelText: '取消',
+          okText: '出荷する',
+          cancelText: 'キャンセル',
           onOk: () => handleSubmit(true),
         })
         return
       }
 
-      message.success('出貨成功')
+      message.success('出荷が完了しました')
       navigate('/inventory')
     } catch {
-      message.error('出貨失敗，請稍後再試')
+      message.error('出荷に失敗しました')
     } finally {
       setSaving(false)
     }
@@ -53,15 +52,15 @@ export default function StockOutPage() {
 
   return (
     <div style={{ padding: 24, maxWidth: 600 }}>
-      <Card title="出貨作業">
+      <Card title="出荷作業">
         <Form form={form} layout="vertical" initialValues={{ transactionDate: dayjs() }}>
           <Form.Item
-            label="產品"
+            label="商品"
             name="productId"
-            rules={[{ required: true, message: '請選擇產品' }]}
+            rules={[{ required: true, message: '商品を選択してください' }]}
           >
             <Select
-              placeholder="選擇產品"
+              placeholder="商品を選択"
               showSearch
               optionFilterProp="label"
               options={products.map((p) => ({
@@ -72,34 +71,34 @@ export default function StockOutPage() {
           </Form.Item>
 
           <Form.Item
-            label="出貨數量"
+            label="出荷数量"
             name="quantity"
             rules={[
-              { required: true, message: '請輸入數量' },
-              { type: 'number', min: 1, message: '數量必須大於 0' },
+              { required: true, message: '数量を入力してください' },
+              { type: 'number', min: 1, message: '数量は1以上で入力してください' },
             ]}
           >
             <InputNumber min={1} style={{ width: '100%' }} />
           </Form.Item>
 
           <Form.Item
-            label="出貨日期"
+            label="出荷日"
             name="transactionDate"
-            rules={[{ required: true, message: '請選擇日期' }]}
+            rules={[{ required: true, message: '日付を選択してください' }]}
           >
             <DatePicker showTime style={{ width: '100%' }} />
           </Form.Item>
 
-          <Form.Item label="備註" name="remark">
+          <Form.Item label="備考" name="remark">
             <Input.TextArea rows={2} maxLength={500} />
           </Form.Item>
 
           <Form.Item>
             <Button type="primary" onClick={() => handleSubmit(false)} loading={saving}>
-              確認出貨
+              出荷確認
             </Button>
             <Button style={{ marginLeft: 8 }} onClick={() => navigate('/inventory')}>
-              取消
+              キャンセル
             </Button>
           </Form.Item>
         </Form>

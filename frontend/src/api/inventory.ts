@@ -6,11 +6,30 @@ export interface InventoryOverview {
   productCode: string
   productName: string
   unit: string
-  currentStock: number
   sixMonthAvgShipment: number
-  suggestedProcurementQty: number
   stockStatus: 'Normal' | 'Low'
   updatedAt: string
+  // 倉庫欄位
+  warehouse89: number
+  warehouse81: number
+  warehouseInspection: number
+  warehouse4th: number
+  totalWarehouseStock: number
+  unallocatedQty: number
+  shippedQty: number
+  safetyStock: number
+  turnoverMonths: number
+  leadTimeMonths: number
+  // 半年分の月次発注提案
+  monthlyOrderSuggestions?: MonthlyOrderSuggestion[]
+}
+
+export interface MonthlyOrderSuggestion {
+  label: string
+  year: number
+  month: number
+  suggestedQty: number
+  estimatedStock: number
 }
 
 export interface StockInDto {

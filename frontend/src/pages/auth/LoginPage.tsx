@@ -15,22 +15,22 @@ export default function LoginPage() {
       setToken(data.token, { account: data.username, displayName: data.displayName })
       navigate('/', { replace: true })
     } catch {
-      message.error('帳號或密碼錯誤')
+      message.error('アカウントまたはパスワードが正しくありません')
     }
   }
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f0f2f5' }}>
-      <Card title="採購下單及庫存管理系統" style={{ width: 360 }}>
+      <Card title="調達発注・在庫管理システム" style={{ width: 360 }}>
         <Form form={form} onFinish={handleSubmit} layout="vertical">
-          <Form.Item name="username" rules={[{ required: true, message: '請輸入帳號' }]}>
-            <Input prefix={<UserOutlined />} placeholder="帳號" />
+          <Form.Item name="username" rules={[{ required: true, message: 'アカウントを入力してください' }]}>
+            <Input prefix={<UserOutlined />} placeholder="アカウント" />
           </Form.Item>
-          <Form.Item name="password" rules={[{ required: true, message: '請輸入密碼' }]}>
-            <Input.Password prefix={<LockOutlined />} placeholder="密碼" />
+          <Form.Item name="password" rules={[{ required: true, message: 'パスワードを入力してください' }]}>
+            <Input.Password prefix={<LockOutlined />} placeholder="パスワード" />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" block>登入</Button>
+            <Button type="primary" htmlType="submit" block>ログイン</Button>
           </Form.Item>
         </Form>
       </Card>

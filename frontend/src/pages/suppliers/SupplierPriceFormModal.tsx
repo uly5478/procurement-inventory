@@ -16,7 +16,7 @@ interface Props {
   confirmLoading?: boolean
 }
 
-const CURRENCIES = ['TWD', 'USD', 'EUR', 'JPY']
+const CURRENCIES = ['CNY', 'TWD', 'USD', 'EUR', 'JPY']
 
 export default function SupplierPriceFormModal({
   open,
@@ -40,7 +40,7 @@ export default function SupplierPriceFormModal({
         })
       } else {
         form.resetFields()
-        form.setFieldValue('currency', 'TWD')
+        form.setFieldValue('currency', 'CNY')
       }
     }
   }, [open, editingRecord, form])
@@ -52,41 +52,41 @@ export default function SupplierPriceFormModal({
 
   return (
     <Modal
-      title={isEdit ? '編輯廠商報價' : '新增廠商報價'}
+      title={isEdit ? '仕入先単価の編集' : '仕入先単価の追加'}
       open={open}
       onOk={handleOk}
       onCancel={onCancel}
       confirmLoading={confirmLoading}
-      okText="確認"
-      cancelText="取消"
+      okText="保存"
+      cancelText="キャンセル"
       destroyOnClose
     >
       <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
         <Form.Item
           name="supplierName"
-          label="廠商名稱"
-          rules={[{ required: true, message: '請輸入廠商名稱' }]}
+          label="仕入先名"
+          rules={[{ required: true, message: '仕入先名を入力してください' }]}
         >
-          <Input disabled={isEdit} placeholder="請輸入廠商名稱" />
+          <Input disabled={isEdit} placeholder="仕入先名を入力" />
         </Form.Item>
 
         <Form.Item
           name="unitPrice"
-          label="買價"
-          rules={[{ required: true, message: '請輸入買價' }]}
+          label="単価"
+          rules={[{ required: true, message: '単価を入力してください' }]}
         >
           <InputNumber
             min={0}
             precision={2}
             style={{ width: '100%' }}
-            placeholder="請輸入買價"
+            placeholder="単価を入力"
           />
         </Form.Item>
 
         <Form.Item
           name="currency"
-          label="幣別"
-          rules={[{ required: true, message: '請選擇幣別' }]}
+          label="通貨"
+          rules={[{ required: true, message: '通貨を選択してください' }]}
         >
           <Select>
             {CURRENCIES.map((c) => (
@@ -99,18 +99,18 @@ export default function SupplierPriceFormModal({
 
         <Form.Item
           name="minOrderQty"
-          label="最小訂購量"
-          rules={[{ required: true, message: '請輸入最小訂購量' }]}
+          label="最小発注数"
+          rules={[{ required: true, message: '最小発注数を入力してください' }]}
         >
-          <InputNumber min={1} style={{ width: '100%' }} placeholder="請輸入最小訂購量" />
+          <InputNumber min={1} style={{ width: '100%' }} placeholder="最小発注数" />
         </Form.Item>
 
         <Form.Item
           name="leadTimeDays"
-          label="交期天數"
-          rules={[{ required: true, message: '請輸入交期天數' }]}
+          label="リードタイム（日）"
+          rules={[{ required: true, message: 'リードタイムを入力してください' }]}
         >
-          <InputNumber min={1} style={{ width: '100%' }} placeholder="請輸入交期天數" />
+          <InputNumber min={1} style={{ width: '100%' }} placeholder="リードタイム" />
         </Form.Item>
       </Form>
     </Modal>

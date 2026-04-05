@@ -23,4 +23,9 @@ public interface ISupplierService
     /// 更新廠商報價：將舊報價 IsCurrent 設為 false，建立新報價記錄（IsCurrent=true）。
     /// </summary>
     Task<SupplierPriceDto> UpdateSupplierPriceAsync(int priceId, UpdateSupplierPriceDto dto);
+
+    /// <summary>
+    /// 取得推薦供應商（最低單價）。
+    /// </summary>
+    Task<SupplierPriceDto?> GetRecommendedSupplierAsync(int productId);
 }

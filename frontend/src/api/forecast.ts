@@ -28,6 +28,23 @@ export interface ProductForecastDetail {
   errorMessage?: string
 }
 
+export interface MonthlyShipmentDetailDto {
+  year: number
+  month: number
+  totalShipped: number
+  average: number
+  aboveAverage: boolean
+  transactions: ShipmentTransactionDto[]
+}
+
+export interface ShipmentTransactionDto {
+  id: number
+  transactionDate: string
+  quantity: number
+  operatorAccount: string
+  remark?: string
+}
+
 export async function getAllForecasts() {
   const res = await client.get<ApiResponse<DemandForecastDto[]>>('/forecast')
   return res.data.data
@@ -35,5 +52,12 @@ export async function getAllForecasts() {
 
 export async function getProductForecast(productId: number) {
   const res = await client.get<ApiResponse<ProductForecastDetail>>(`/forecast/${productId}`)
+  return res.data.data
+}
+
+export async function getMonthlyDetail(productId: number, year: number, month: number) {
+  const res = await client.get<ApiResponse<MonthlyShipmentDetailDto>>(
+    `/forecast/${productId}/monthly-detail/${year}/${month}`
+  )
   return res.data.data
 }

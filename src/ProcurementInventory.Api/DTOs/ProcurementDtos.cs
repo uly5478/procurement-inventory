@@ -22,6 +22,32 @@ public class ProcurementSuggestionDto
     public int? AvailableMonths { get; set; }
 
     public DateTime CalculatedAt { get; set; }
+
+    // NEW: Procurement fields
+    public int BoxQty { get; set; }
+    public int MOQ { get; set; }
+    public int SafetyStock { get; set; }
+
+    // NEW: Recommended supplier info (1st cheapest)
+    public string? RecommendedSupplierName { get; set; }
+    public decimal? RecommendedUnitPrice { get; set; }
+    public string? RecommendedCurrency { get; set; }
+    public int? RecommendedLeadTimeDays { get; set; }
+    /// <summary>第1仕入先への発注数（60%、箱入数丸め済み）</summary>
+    public int? Supplier1OrderQty { get; set; }
+
+    // 2nd cheapest supplier
+    public string? Supplier2Name { get; set; }
+    public decimal? Supplier2UnitPrice { get; set; }
+    public string? Supplier2Currency { get; set; }
+    public int? Supplier2LeadTimeDays { get; set; }
+    /// <summary>第2仕入先への発注数（40%、箱入数丸め済み）</summary>
+    public int? Supplier2OrderQty { get; set; }
+
+    public bool NoSupplier { get; set; }
+
+    /// <summary>半年分の月次発注提案（在庫一覧と同じロジック）</summary>
+    public List<MonthlyOrderSuggestionDto> MonthlyOrderSuggestions { get; set; } = new();
 }
 
 /// <summary>

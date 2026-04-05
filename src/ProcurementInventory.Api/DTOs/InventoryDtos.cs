@@ -63,12 +63,60 @@ public class InventoryOverviewDto
     public string ProductCode { get; set; } = string.Empty;
     public string ProductName { get; set; } = string.Empty;
     public string Unit { get; set; } = string.Empty;
-    public int CurrentStock { get; set; }
     public decimal SixMonthAvgShipment { get; set; }
-    public int SuggestedProcurementQty { get; set; }
-    /// <summary>庫存狀態：Normal / Low（低於六個月平均出貨量）</summary>
+    /// <summary>庫存狀態：Normal / Low（低於安全在庫）</summary>
     public string StockStatus { get; set; } = "Normal";
     public DateTime UpdatedAt { get; set; }
+
+    // Warehouse breakdown
+    public int Warehouse89 { get; set; }
+    public int Warehouse81 { get; set; }
+    public int WarehouseInspection { get; set; }
+    public int Warehouse4th { get; set; }
+    public int TotalWarehouseStock { get; set; }
+    public int UnallocatedQty { get; set; }
+    public int ShippedQty { get; set; }
+    public int SafetyStock { get; set; }
+
+    /// <summary>回転月数（設定値）</summary>
+    public decimal TurnoverMonths { get; set; }
+    /// <summary>リードタイム月数（推奨仕入先の LeadTimeDays / 30）</summary>
+    public decimal LeadTimeMonths { get; set; }
+
+    /// <summary>半年分の月次発注提案（今月〜6ヶ月先）</summary>
+    public List<MonthlyOrderSuggestionDto> MonthlyOrderSuggestions { get; set; } = new();
+}
+
+/// <summary>月次発注提案 DTO</summary>
+public class MonthlyOrderSuggestionDto
+{
+    /// <summary>対象年月ラベル（例: 2026/04）</summary>
+    public string Label { get; set; } = string.Empty;
+    public int Year { get; set; }
+    public int Month { get; set; }
+    /// <summary>その月に必要な発注数（0以下は発注不要）</summary>
+    public int SuggestedQty { get; set; }
+    /// <summary>その月時点の推定在庫</summary>
+    public int EstimatedStock { get; set; }
+}
+
+/// <summary>庫存總覽拡張 DTO（Excel エクスポート用）</summary>
+public class InventoryOverviewExtendedDto : InventoryOverviewDto
+{
+    public int BoxQty { get; set; }
+    public int Moq { get; set; }
+    public decimal AverageShipment { get; set; }
+    public List<SupplierInfoForExportDto> Suppliers { get; set; } = new();
+    public Dictionary<int, int> MonthlyShipments { get; set; } = new(); // Month (1-12) -> Qty
+}
+
+/// <summary>Excel エクスポート用仕入先情報 DTO</summary>
+public class SupplierInfoForExportDto
+{
+    public string SupplierName { get; set; } = string.Empty;
+    public decimal UnitPrice { get; set; }
+    public string Currency { get; set; } = string.Empty;
+    public int LeadTimeDays { get; set; }
 }
 
 /// <summary>每月出貨統計 DTO</summary>

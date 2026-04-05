@@ -12,6 +12,7 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(false)
   const [keyword, setKeyword] = useState('')
   const [showInactive, setShowInactive] = useState(false)
+  const [categoryCode, setCategoryCode] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const navigate = useNavigate()
@@ -19,16 +20,15 @@ export default function ProductsPage() {
   const fetchProducts = useCallback(async () => {
     setLoading(true)
     try {
-      // when showInactive is true, pass isActive=undefined to get all; otherwise only active
       const isActive = showInactive ? undefined : true
-      const data = await getProducts(keyword || undefined, isActive)
+      const data = await getProducts(keyword || undefined, isActive, categoryCode || undefined)
       setProducts(data)
     } catch {
-      message.error('載入產品清單失敗')
+      message.error('商品一覧の読み込みに失敗しました')
     } finally {
       setLoading(false)
     }
-  }, [keyword, showInactive])
+  }, [keyword, showInactive, categoryCode])
 
   useEffect(() => {
     fetchProducts()
@@ -46,41 +46,46 @@ export default function ProductsPage() {
 
   function handleDeactivate(product: Product) {
     Modal.confirm({
-      title: '確認停用',
-      content: `確定要停用產品「${product.name}」嗎？停用後將不會出現在一般清單中。`,
-      okText: '確認停用',
+      title: '無効化の確認',
+      content: `商品「${product.name}」を無効化しますか？無効化後は通常の一覧に表示されなくなります。`,
+      okText: '無効化',
       okType: 'danger',
-      cancelText: '取消',
+      cancelText: 'キャンセル',
       onOk: async () => {
         try {
           await deactivateProduct(product.id)
-          message.success('產品已停用')
+          message.success('商品を無効化しました')
           fetchProducts()
         } catch {
-          message.error('停用失敗，請稍後再試')
+          message.error('無効化に失敗しました')
         }
       },
     })
   }
 
   const columns: ColumnsType<Product> = [
-    { title: '產品編號', dataIndex: 'productCode', key: 'productCode', width: 120 },
-    { title: '產品名稱', dataIndex: 'name', key: 'name' },
-    { title: '單位', dataIndex: 'unit', key: 'unit', width: 80 },
+    { title: '商品コード', dataIndex: 'productCode', key: 'productCode', width: 120 },
+    { title: '商品名', dataIndex: 'name', key: 'name' },
+    { title: '単位', dataIndex: 'unit', key: 'unit', width: 80 },
+    { title: '仕入分類', dataIndex: 'categoryCode', key: 'categoryCode', width: 100, render: (val?: string) => val ? <Tag color="blue">{val}</Tag> : '-' },
+    { title: '箱入数', dataIndex: 'boxQty', key: 'boxQty', width: 80 },
+    { title: 'MOQ', dataIndex: 'moq', key: 'moq', width: 80 },
+    { title: '安全在庫', dataIndex: 'safetyStock', key: 'safetyStock', width: 90 },
+    { title: '平均出荷数', dataIndex: 'averageShipment', key: 'averageShipment', width: 100 },
     {
-      title: '狀態',
+      title: 'ステータス',
       dataIndex: 'isActive',
       key: 'isActive',
-      width: 90,
+      width: 100,
       render: (isActive: boolean) =>
-        isActive ? <Tag color="green">啟用</Tag> : <Tag color="default">停用</Tag>,
+        isActive ? <Tag color="green">有効</Tag> : <Tag color="default">無効</Tag>,
     },
     {
-      title: '建立時間',
+      title: '作成日時',
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 160,
-      render: (val: string) => new Date(val).toLocaleString('zh-TW'),
+      render: (val: string) => new Date(val).toLocaleString('ja-JP'),
     },
     {
       title: '操作',
@@ -89,14 +94,14 @@ export default function ProductsPage() {
       render: (_, record) => (
         <Space>
           <Button size="small" icon={<ShopOutlined />} onClick={() => navigate(`/products/${record.id}/suppliers`)}>
-            廠商報價
+            仕入先単価
           </Button>
           <Button size="small" onClick={() => openEdit(record)}>
-            編輯
+            編集
           </Button>
           {record.isActive && (
             <Button size="small" danger onClick={() => handleDeactivate(record)}>
-              停用
+              無効化
             </Button>
           )}
         </Space>
@@ -108,19 +113,26 @@ export default function ProductsPage() {
     <div style={{ padding: 24 }}>
       <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
         <Input
-          placeholder="搜尋產品編號或名稱"
+          placeholder="商品コードまたは商品名で検索"
           prefix={<SearchOutlined />}
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
           allowClear
-          style={{ width: 240 }}
+          style={{ width: 260 }}
+        />
+        <Input
+          placeholder="仕入分類コード"
+          value={categoryCode}
+          onChange={(e) => setCategoryCode(e.target.value)}
+          allowClear
+          style={{ width: 140 }}
         />
         <Space>
-          <span>顯示停用產品</span>
+          <span>無効な商品を表示</span>
           <Switch checked={showInactive} onChange={setShowInactive} />
         </Space>
         <Button type="primary" icon={<PlusOutlined />} onClick={openCreate} style={{ marginLeft: 'auto' }}>
-          新增產品
+          商品を追加
         </Button>
       </div>
 

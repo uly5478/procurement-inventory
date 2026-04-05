@@ -7,8 +7,8 @@ namespace ProcurementInventory.Api.Services;
 /// </summary>
 public interface IProductService
 {
-    /// <summary>查詢產品清單（支援關鍵字搜尋與狀態篩選）</summary>
-    Task<IEnumerable<ProductDto>> GetProductsAsync(string? keyword, bool? isActive);
+    /// <summary>查詢產品清單（支援關鍵字搜尋、狀態篩選、仕入分類コードフィルター）</summary>
+    Task<IEnumerable<ProductDto>> GetProductsAsync(string? keyword, bool? isActive, string? categoryCode = null);
 
     /// <summary>依 Id 取得產品</summary>
     Task<ProductDto?> GetProductByIdAsync(int id);

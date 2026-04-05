@@ -26,11 +26,11 @@ public class ProductsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<ApiResponse<IEnumerable<ProductDto>>>> GetProducts(
         [FromQuery] string? keyword,
-        [FromQuery] bool? isActive)
+        [FromQuery] bool? isActive,
+        [FromQuery] string? categoryCode)
     {
-        // 預設只回傳啟用產品
         var activeFilter = isActive ?? true;
-        var products = await _productService.GetProductsAsync(keyword, activeFilter);
+        var products = await _productService.GetProductsAsync(keyword, activeFilter, categoryCode);
         return Ok(ApiResponse<IEnumerable<ProductDto>>.Ok(products));
     }
 

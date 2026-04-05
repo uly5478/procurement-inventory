@@ -142,17 +142,31 @@ public class DemandForecastService : IDemandForecastService
     private async Task<List<(int Year, int Month, int TotalShipped)>> GetMonthlyShipmentsAsync(
         int productId, int months)
     {
-        var cutoff = DateTime.UtcNow.AddMonths(-months);
+        // MonthlyShipments テーブルから取得（より正確）
+        var shipments = await _db.MonthlyShipments
+            .Where(m => m.ProductId == productId)
+            .OrderByDescending(m => m.Year).ThenByDescending(m => m.Month)
+            .Take(months)
+            .ToListAsync();
+
+        if (shipments.Count > 0)
+        {
+            return shipments
+                .OrderBy(m => m.Year).ThenBy(m => m.Month)
+                .Select(m => (m.Year, m.Month, m.Quantity))
+                .ToList();
+        }
+
+        // フォールバック: StockTransactions から集計（期間制限なし）
         var transactions = await _db.StockTransactions
-            .Where(t => t.ProductId == productId
-                     && t.TransactionType == "出貨"
-                     && t.TransactionDate >= cutoff)
+            .Where(t => t.ProductId == productId && t.TransactionType == "出荷")
             .ToListAsync();
 
         return transactions
             .GroupBy(t => new { t.TransactionDate.Year, t.TransactionDate.Month })
             .Select(g => (g.Key.Year, g.Key.Month, g.Sum(t => t.Quantity)))
             .OrderBy(m => m.Year).ThenBy(m => m.Month)
+            .TakeLast(months)
             .ToList();
     }
 

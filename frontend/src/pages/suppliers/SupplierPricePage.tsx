@@ -28,7 +28,7 @@ export default function SupplierPricePage() {
       const result = await getProductSuppliers(productId)
       setPrices(result.items)
     } catch {
-      message.error('載入廠商報價失敗')
+      message.error('仕入先単価の読み込みに失敗しました')
     } finally {
       setLoading(false)
     }
@@ -58,7 +58,6 @@ export default function SupplierPricePage() {
     setSubmitting(true)
     try {
       if (editingRecord) {
-        // 更新報價
         const dto: UpdateSupplierPriceDto = {
           unitPrice: values.unitPrice,
           currency: values.currency,
@@ -66,15 +65,14 @@ export default function SupplierPricePage() {
           leadTimeDays: values.leadTimeDays,
         }
         await updateSupplierPrice(editingRecord.id, dto)
-        message.success('廠商報價已更新')
+        message.success('仕入先単価を更新しました')
         setModalOpen(false)
         fetchPrices()
       } else {
-        // 新增報價
         await doAddSupplierPrice(values, false)
       }
     } catch {
-      message.error('操作失敗，請稍後再試')
+      message.error('操作に失敗しました')
     } finally {
       setSubmitting(false)
     }
@@ -94,13 +92,12 @@ export default function SupplierPricePage() {
     const result = await addSupplierPrice(productId, dto)
 
     if (result.requireConfirmation) {
-      // 需求 2.4：第 5 家廠商警告
       setModalOpen(false)
       Modal.confirm({
-        title: '廠商數量警告',
-        content: result.warning ?? '此產品已有 4 家廠商，是否確認繼續新增第 5 家廠商？',
-        okText: '確認新增',
-        cancelText: '取消',
+        title: '仕入先数の警告',
+        content: result.warning ?? 'この商品には既に4社の仕入先が登録されています。5社目を追加しますか？',
+        okText: '追加する',
+        cancelText: 'キャンセル',
         onOk: async () => {
           setSubmitting(true)
           try {
@@ -111,7 +108,7 @@ export default function SupplierPricePage() {
         },
       })
     } else {
-      message.success('廠商報價已新增')
+      message.success('仕入先単価を追加しました')
       setModalOpen(false)
       fetchPrices()
     }
@@ -119,44 +116,44 @@ export default function SupplierPricePage() {
 
   const columns: ColumnsType<ProductSupplierPrice> = [
     {
-      title: '廠商名稱',
+      title: '仕入先名',
       dataIndex: 'supplierName',
       key: 'supplierName',
     },
     {
-      title: '買價',
+      title: '単価',
       dataIndex: 'unitPrice',
       key: 'unitPrice',
       render: (val: number) => val.toLocaleString(),
     },
     {
-      title: '幣別',
+      title: '通貨',
       dataIndex: 'currency',
       key: 'currency',
       render: (val: string) => <Tag>{val}</Tag>,
     },
     {
-      title: '最小訂購量',
+      title: '最小発注数',
       dataIndex: 'minOrderQty',
       key: 'minOrderQty',
     },
     {
-      title: '交期（天）',
+      title: 'リードタイム（日）',
       dataIndex: 'leadTimeDays',
       key: 'leadTimeDays',
     },
     {
-      title: '生效日期',
+      title: '適用開始日',
       dataIndex: 'effectiveDate',
       key: 'effectiveDate',
-      render: (val: string) => new Date(val).toLocaleDateString('zh-TW'),
+      render: (val: string) => new Date(val).toLocaleDateString('ja-JP'),
     },
     {
       title: '操作',
       key: 'actions',
       render: (_, record) => (
         <Button type="link" onClick={() => handleEdit(record)}>
-          編輯
+          編集
         </Button>
       ),
     },
@@ -166,11 +163,11 @@ export default function SupplierPricePage() {
     <div style={{ padding: 24 }}>
       <Space style={{ marginBottom: 16, justifyContent: 'space-between', width: '100%' }}>
         <Space>
-          <Button onClick={() => navigate('/products')}>返回產品清單</Button>
-          <h2 style={{ margin: 0 }}>產品 ID: {productId} 的廠商報價</h2>
+          <Button onClick={() => navigate('/products')}>商品一覧に戻る</Button>
+          <h2 style={{ margin: 0 }}>商品ID: {productId} の仕入先単価</h2>
         </Space>
         <Button type="primary" onClick={handleAdd}>
-          新增廠商報價
+          仕入先単価を追加
         </Button>
       </Space>
 

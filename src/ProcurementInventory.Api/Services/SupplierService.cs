@@ -104,6 +104,15 @@ public class SupplierService : ISupplierService
         return ToDto(created);
     }
 
+    /// <inheritdoc/>
+    public async Task<SupplierPriceDto?> GetRecommendedSupplierAsync(int productId)
+    {
+        var prices = await _repo.GetCurrentPricesByProductIdAsync(productId);
+        var recommended = prices.OrderBy(p => p.UnitPrice).FirstOrDefault();
+        
+        return recommended == null ? null : ToDto(recommended);
+    }
+
     private static SupplierPriceDto ToDto(ProductSupplierPrice p) => new()
     {
         Id = p.Id,

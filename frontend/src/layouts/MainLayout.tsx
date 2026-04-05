@@ -3,20 +3,18 @@ import { Layout, Menu, Button, theme } from 'antd'
 import {
   LogoutOutlined, BulbOutlined, BulbFilled,
   AppstoreOutlined, CalculatorOutlined, FileTextOutlined,
-  DatabaseOutlined, ImportOutlined, ExportOutlined, LineChartOutlined,
+  DatabaseOutlined, LineChartOutlined,
 } from '@ant-design/icons'
 import useAuthStore from '../store/authStore'
 
 const { Sider, Content, Header } = Layout
 
 const menuItems = [
-  { key: '/products', icon: <AppstoreOutlined />, label: '產品管理' },
-  { key: '/procurement/suggestions', icon: <CalculatorOutlined />, label: '採購建議' },
-  { key: '/procurement/orders', icon: <FileTextOutlined />, label: '採購訂單' },
-  { key: '/inventory', icon: <DatabaseOutlined />, label: '庫存總覽' },
-  { key: '/inventory/stock-in', icon: <ImportOutlined />, label: '入庫作業' },
-  { key: '/inventory/stock-out', icon: <ExportOutlined />, label: '出貨作業' },
-  { key: '/forecast', icon: <LineChartOutlined />, label: '需求預測' },
+  { key: '/products', icon: <AppstoreOutlined />, label: '商品管理' },
+  { key: '/procurement/suggestions', icon: <CalculatorOutlined />, label: '調達提案' },
+  { key: '/procurement/orders', icon: <FileTextOutlined />, label: '発注管理' },
+  { key: '/inventory', icon: <DatabaseOutlined />, label: '在庫一覧' },
+  { key: '/forecast', icon: <LineChartOutlined />, label: '需要予測' },
 ]
 
 interface MainLayoutProps {
@@ -49,7 +47,7 @@ export default function MainLayout({ isDark, toggleTheme }: MainLayoutProps) {
           color: '#fff', fontWeight: 'bold', fontSize: 14,
           borderBottom: '1px solid rgba(255,255,255,0.1)',
         }}>
-          採購庫存管理
+          調達在庫管理
         </div>
         <Menu
           theme="dark"
@@ -58,7 +56,6 @@ export default function MainLayout({ isDark, toggleTheme }: MainLayoutProps) {
           items={menuItems}
           onClick={({ key }) => navigate(key)}
         />
-        {/* 主題切換 — 絕對定位在 Sider 最底部 */}
         <div style={{
           position: 'absolute', bottom: 24, left: 0, right: 0,
           padding: '12px 16px',
@@ -72,7 +69,7 @@ export default function MainLayout({ isDark, toggleTheme }: MainLayoutProps) {
             size="small"
             style={{ background: 'transparent', color: '#fff', borderColor: 'rgba(255,255,255,0.3)' }}
           >
-            {isDark ? '淺色模式' : '深色模式'}
+            {isDark ? 'ライトモード' : 'ダークモード'}
           </Button>
         </div>
       </Sider>
@@ -83,10 +80,10 @@ export default function MainLayout({ isDark, toggleTheme }: MainLayoutProps) {
           borderBottom: `1px solid ${colorToken.colorBorderSecondary}`,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
-          <span style={{ fontWeight: 500 }}>採購下單及庫存管理系統</span>
+          <span style={{ fontWeight: 500 }}>調達発注・在庫管理システム</span>
           <span>
             <span style={{ marginRight: 16, color: colorToken.colorTextSecondary }}>{user?.displayName}</span>
-            <Button icon={<LogoutOutlined />} onClick={handleLogout} size="small">登出</Button>
+            <Button icon={<LogoutOutlined />} onClick={handleLogout} size="small">ログアウト</Button>
           </span>
         </Header>
         <Content style={{

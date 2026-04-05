@@ -20,6 +20,11 @@ export interface Product {
   name: string
   unit: string
   isActive: boolean
+  boxQty: number
+  moq: number
+  safetyStock: number
+  averageShipment: number
+  categoryCode?: string
   createdAt: string
   updatedAt: string
 }
@@ -47,7 +52,7 @@ export interface ProductSupplierPrice {
 
 // ─── Purchase order ───────────────────────────────────────────────────────────
 
-export type PurchaseOrderStatus = 'Pending' | 'Confirmed' | 'Received' | 'Cancelled'
+export type PurchaseOrderStatus = 'Pending' | 'Confirmed' | 'Received' | 'Cancelled' | '待確認' | '已確認' | '已入荷' | 'キャンセル'
 
 export interface PurchaseOrderItem {
   id: number
@@ -114,6 +119,33 @@ export interface ProcurementSuggestion {
   dataInsufficient: boolean
   availableMonths?: number
   calculatedAt: string
+  // NEW fields
+  boxQty: number
+  moq: number
+  safetyStock: number
+  // 第1仕入先（最安値）
+  recommendedSupplierName?: string
+  recommendedUnitPrice?: number
+  recommendedCurrency?: string
+  recommendedLeadTimeDays?: number
+  supplier1OrderQty?: number
+  // 第2仕入先（2番目安値）
+  supplier2Name?: string
+  supplier2UnitPrice?: number
+  supplier2Currency?: string
+  supplier2LeadTimeDays?: number
+  supplier2OrderQty?: number
+  noSupplier: boolean
+  // 半年分の月次発注提案
+  monthlyOrderSuggestions?: MonthlyOrderSuggestionForSuggestion[]
+}
+
+export interface MonthlyOrderSuggestionForSuggestion {
+  label: string
+  year: number
+  month: number
+  suggestedQty: number
+  estimatedStock: number
 }
 
 export interface ProcurementSettings {
@@ -134,4 +166,58 @@ export interface DemandForecast {
   confidenceLower: number
   confidenceUpper: number
   generatedAt: string
+}
+
+// ─── Monthly Shipment ─────────────────────────────────────────────────────────
+
+export interface MonthlyShipmentRecord {
+  id: number
+  productId: number
+  year: number
+  month: number
+  quantity: number
+}
+
+export interface MonthlyShipmentResult {
+  year: number
+  jan: number
+  feb: number
+  mar: number
+  apr: number
+  may: number
+  jun: number
+  jul: number
+  aug: number
+  sep: number
+  oct: number
+  nov: number
+  dec: number
+}
+
+// ─── Warehouse Stock ──────────────────────────────────────────────────────────
+
+export interface WarehouseStock {
+  productId: number
+  warehouse89: number
+  warehouse81: number
+  warehouseInspection: number
+  warehouse4th: number
+  totalStock: number
+  unallocatedQty: number
+  shippedQty: number
+  updatedAt: string
+}
+
+// ─── Monthly Inventory ────────────────────────────────────────────────────────
+
+export interface MonthlyInventory {
+  id: number
+  productId: number
+  year: number
+  month: number
+  orderQty: number
+  stockQty: number
+  stockAmount: number
+  turnoverRate: number
+  createdAt: string
 }

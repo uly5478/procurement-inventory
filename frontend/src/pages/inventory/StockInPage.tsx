@@ -5,8 +5,7 @@ import dayjs from 'dayjs'
 import { stockIn } from '../../api/inventory'
 import { getProducts } from '../../api/products'
 import { getPurchaseOrders } from '../../api/purchaseOrders'
-import type { Product } from '../../types'
-import type { PurchaseOrder } from '../../types'
+import type { Product, PurchaseOrder } from '../../types'
 
 export default function StockInPage() {
   const [form] = Form.useForm()
@@ -31,10 +30,10 @@ export default function StockInPage() {
         purchaseOrderId: values.purchaseOrderId,
         remark: values.remark,
       })
-      message.success('入庫成功')
+      message.success('入庫が完了しました')
       navigate('/inventory')
     } catch {
-      message.error('入庫失敗，請稍後再試')
+      message.error('入庫に失敗しました')
     } finally {
       setSaving(false)
     }
@@ -45,12 +44,12 @@ export default function StockInPage() {
       <Card title="入庫作業">
         <Form form={form} layout="vertical" initialValues={{ transactionDate: dayjs() }}>
           <Form.Item
-            label="產品"
+            label="商品"
             name="productId"
-            rules={[{ required: true, message: '請選擇產品' }]}
+            rules={[{ required: true, message: '商品を選択してください' }]}
           >
             <Select
-              placeholder="選擇產品"
+              placeholder="商品を選択"
               showSearch
               optionFilterProp="label"
               options={products.map((p) => ({
@@ -61,27 +60,27 @@ export default function StockInPage() {
           </Form.Item>
 
           <Form.Item
-            label="入庫數量"
+            label="入庫数量"
             name="quantity"
             rules={[
-              { required: true, message: '請輸入數量' },
-              { type: 'number', min: 1, message: '數量必須大於 0' },
+              { required: true, message: '数量を入力してください' },
+              { type: 'number', min: 1, message: '数量は1以上で入力してください' },
             ]}
           >
             <InputNumber min={1} style={{ width: '100%' }} />
           </Form.Item>
 
           <Form.Item
-            label="入庫日期"
+            label="入庫日"
             name="transactionDate"
-            rules={[{ required: true, message: '請選擇日期' }]}
+            rules={[{ required: true, message: '日付を選択してください' }]}
           >
             <DatePicker showTime style={{ width: '100%' }} />
           </Form.Item>
 
-          <Form.Item label="對應採購訂單（選填）" name="purchaseOrderId">
+          <Form.Item label="対応する発注（任意）" name="purchaseOrderId">
             <Select
-              placeholder="選擇採購訂單"
+              placeholder="発注を選択"
               allowClear
               showSearch
               optionFilterProp="label"
@@ -92,16 +91,16 @@ export default function StockInPage() {
             />
           </Form.Item>
 
-          <Form.Item label="備註" name="remark">
+          <Form.Item label="備考" name="remark">
             <Input.TextArea rows={2} maxLength={500} />
           </Form.Item>
 
           <Form.Item>
             <Button type="primary" onClick={handleSubmit} loading={saving}>
-              確認入庫
+              入庫確認
             </Button>
             <Button style={{ marginLeft: 8 }} onClick={() => navigate('/inventory')}>
-              取消
+              キャンセル
             </Button>
           </Form.Item>
         </Form>

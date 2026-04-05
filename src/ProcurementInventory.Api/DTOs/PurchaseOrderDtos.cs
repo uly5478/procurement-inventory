@@ -49,3 +49,32 @@ public class PurchaseOrderQueryDto
     public string? SupplierName { get; set; }
     public string? Status { get; set; }
 }
+
+/// <summary>発注統計 DTO</summary>
+public class PurchaseOrderStatsDto
+{
+    public int TotalOrders { get; set; }
+    public int PendingOrders { get; set; }
+    public int ConfirmedOrders { get; set; }
+    public int ReceivedOrders { get; set; }
+    public int CancelledOrders { get; set; }
+    public decimal TotalAmount { get; set; }
+    public List<MonthlyOrderStatDto> MonthlyStats { get; set; } = new();
+    public List<SupplierOrderStatDto> SupplierStats { get; set; } = new();
+}
+
+/// <summary>月別発注統計</summary>
+public class MonthlyOrderStatDto
+{
+    public string Label { get; set; } = string.Empty;
+    public int OrderCount { get; set; }
+    public decimal TotalAmount { get; set; }
+}
+
+/// <summary>仕入先別発注統計</summary>
+public class SupplierOrderStatDto
+{
+    public string SupplierName { get; set; } = string.Empty;
+    public int OrderCount { get; set; }
+    public decimal TotalAmount { get; set; }
+}

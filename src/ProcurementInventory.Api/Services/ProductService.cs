@@ -17,9 +17,9 @@ public class ProductService : IProductService
     }
 
     /// <inheritdoc/>
-    public async Task<IEnumerable<ProductDto>> GetProductsAsync(string? keyword, bool? isActive)
+    public async Task<IEnumerable<ProductDto>> GetProductsAsync(string? keyword, bool? isActive, string? categoryCode = null)
     {
-        var products = await _repo.GetAllAsync(keyword, isActive);
+        var products = await _repo.GetAllAsync(keyword, isActive, categoryCode);
         return products.Select(ToDto);
     }
 
@@ -42,6 +42,11 @@ public class ProductService : IProductService
             ProductCode = dto.ProductCode,
             Name = dto.Name,
             Unit = dto.Unit,
+            BoxQty = dto.BoxQty,
+            MOQ = dto.MOQ,
+            SafetyStock = dto.SafetyStock,
+            AverageShipment = dto.AverageShipment,
+            CategoryCode = dto.CategoryCode,
             IsActive = true,
             CreatedAt = DateTime.UtcNow
         };
@@ -58,7 +63,11 @@ public class ProductService : IProductService
 
         product.Name = dto.Name;
         product.Unit = dto.Unit;
-        // 需求 1.4：記錄最後修改時間
+        product.BoxQty = dto.BoxQty;
+        product.MOQ = dto.MOQ;
+        product.SafetyStock = dto.SafetyStock;
+        product.AverageShipment = dto.AverageShipment;
+        product.CategoryCode = dto.CategoryCode;
         product.UpdatedAt = DateTime.UtcNow;
 
         var updated = await _repo.UpdateAsync(product);
@@ -84,6 +93,11 @@ public class ProductService : IProductService
         Name = p.Name,
         Unit = p.Unit,
         IsActive = p.IsActive,
+        BoxQty = p.BoxQty,
+        MOQ = p.MOQ,
+        SafetyStock = p.SafetyStock,
+        AverageShipment = p.AverageShipment,
+        CategoryCode = p.CategoryCode,
         CreatedAt = p.CreatedAt,
         UpdatedAt = p.UpdatedAt
     };

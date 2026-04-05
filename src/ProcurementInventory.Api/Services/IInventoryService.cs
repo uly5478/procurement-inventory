@@ -33,4 +33,9 @@ public interface IInventoryService
     /// 取得所有產品庫存總覽（含六個月平均出貨量、建議採購量、庫存狀態）
     /// </summary>
     Task<IEnumerable<InventoryOverviewDto>> GetInventoryOverviewAsync();
+
+    /// <summary>
+    /// 取得所有產品庫存總覽擴展格式（含供應商、月度出貨、倉庫資訊）
+    /// </summary>
+    Task<IEnumerable<InventoryOverviewExtendedDto>> GetInventoryOverviewExtendedAsync();
 }

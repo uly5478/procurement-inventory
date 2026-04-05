@@ -21,6 +21,9 @@ public class AppDbContext : DbContext
     public DbSet<PurchaseOrderItem> PurchaseOrderItems => Set<PurchaseOrderItem>();
     public DbSet<AuditDiscrepancyLog> AuditDiscrepancyLogs => Set<AuditDiscrepancyLog>();
     public DbSet<DemandForecast> DemandForecasts => Set<DemandForecast>();
+    public DbSet<MonthlyShipment> MonthlyShipments => Set<MonthlyShipment>();
+    public DbSet<WarehouseStock> WarehouseStocks => Set<WarehouseStock>();
+    public DbSet<MonthlyInventory> MonthlyInventories => Set<MonthlyInventory>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -33,6 +36,7 @@ public class AppDbContext : DbContext
             entity.Property(e => e.ProductCode).IsRequired().HasMaxLength(50);
             entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
             entity.Property(e => e.Unit).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.AverageShipment).HasColumnType("decimal(18,4)");
         });
 
         modelBuilder.Entity<Supplier>(entity =>
@@ -150,6 +154,38 @@ public class AppDbContext : DbContext
             entity.Property(e => e.ForecastQty).HasColumnType("decimal(18,4)");
             entity.Property(e => e.ConfidenceLower).HasColumnType("decimal(18,4)");
             entity.Property(e => e.ConfidenceUpper).HasColumnType("decimal(18,4)");
+            entity.HasOne(e => e.Product)
+                  .WithMany()
+                  .HasForeignKey(e => e.ProductId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<MonthlyShipment>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => new { e.ProductId, e.Year, e.Month }).IsUnique();
+            entity.HasOne(e => e.Product)
+                  .WithMany()
+                  .HasForeignKey(e => e.ProductId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<WarehouseStock>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.ProductId).IsUnique();
+            entity.HasOne(e => e.Product)
+                  .WithMany()
+                  .HasForeignKey(e => e.ProductId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<MonthlyInventory>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => new { e.ProductId, e.Year, e.Month }).IsUnique();
+            entity.Property(e => e.StockAmount).HasColumnType("decimal(18,4)");
+            entity.Property(e => e.TurnoverRate).HasColumnType("decimal(10,4)");
             entity.HasOne(e => e.Product)
                   .WithMany()
                   .HasForeignKey(e => e.ProductId)

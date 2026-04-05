@@ -116,6 +116,80 @@ namespace ProcurementInventory.Api.Migrations
                     b.ToTable("InventoryRecords");
                 });
 
+            modelBuilder.Entity("ProcurementInventory.Api.Entities.MonthlyInventory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Month")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("OrderQty")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("StockAmount")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<int>("StockQty")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("TurnoverRate")
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId", "Year", "Month")
+                        .IsUnique();
+
+                    b.ToTable("MonthlyInventories");
+                });
+
+            modelBuilder.Entity("ProcurementInventory.Api.Entities.MonthlyShipment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Month")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId", "Year", "Month")
+                        .IsUnique();
+
+                    b.ToTable("MonthlyShipments");
+                });
+
             modelBuilder.Entity("ProcurementInventory.Api.Entities.ProcurementSettings", b =>
                 {
                     b.Property<int>("Id")
@@ -185,11 +259,23 @@ namespace ProcurementInventory.Api.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal>("AverageShipment")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<int>("BoxQty")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CategoryCode")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
+
+                    b.Property<int>("MOQ")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -200,6 +286,9 @@ namespace ProcurementInventory.Api.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
+
+                    b.Property<int>("SafetyStock")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Unit")
                         .IsRequired()
@@ -409,6 +498,46 @@ namespace ProcurementInventory.Api.Migrations
                     b.ToTable("Suppliers");
                 });
 
+            modelBuilder.Entity("ProcurementInventory.Api.Entities.WarehouseStock", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ShippedQty")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UnallocatedQty")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Warehouse4th")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Warehouse81")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Warehouse89")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("WarehouseInspection")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId")
+                        .IsUnique();
+
+                    b.ToTable("WarehouseStocks");
+                });
+
             modelBuilder.Entity("ProcurementInventory.Api.Entities.AuditDiscrepancyLog", b =>
                 {
                     b.HasOne("ProcurementInventory.Api.Entities.Product", "Product")
@@ -432,6 +561,28 @@ namespace ProcurementInventory.Api.Migrations
                 });
 
             modelBuilder.Entity("ProcurementInventory.Api.Entities.InventoryRecord", b =>
+                {
+                    b.HasOne("ProcurementInventory.Api.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("ProcurementInventory.Api.Entities.MonthlyInventory", b =>
+                {
+                    b.HasOne("ProcurementInventory.Api.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("ProcurementInventory.Api.Entities.MonthlyShipment", b =>
                 {
                     b.HasOne("ProcurementInventory.Api.Entities.Product", "Product")
                         .WithMany()
@@ -503,6 +654,17 @@ namespace ProcurementInventory.Api.Migrations
                 });
 
             modelBuilder.Entity("ProcurementInventory.Api.Entities.StockTransaction", b =>
+                {
+                    b.HasOne("ProcurementInventory.Api.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("ProcurementInventory.Api.Entities.WarehouseStock", b =>
                 {
                     b.HasOne("ProcurementInventory.Api.Entities.Product", "Product")
                         .WithMany()

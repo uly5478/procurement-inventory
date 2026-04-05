@@ -17,18 +17,13 @@ public class ProductRepository : IProductRepository
     }
 
     /// <inheritdoc/>
-    public async Task<IEnumerable<Product>> GetAllAsync(string? keyword, bool? isActive)
+    public async Task<IEnumerable<Product>> GetAllAsync(string? keyword, bool? isActive, string? categoryCode = null)
     {
         var query = _db.Products.AsQueryable();
 
-        // isActive 篩選：null = 全部，true = 只回傳啟用，false = 只回傳停用
         if (isActive.HasValue)
-        {
             query = query.Where(p => p.IsActive == isActive.Value);
-        }
-        // isActive=null 時不加篩選，回傳全部
 
-        // 關鍵字模糊搜尋（ProductCode 或 Name，不區分大小寫）
         if (!string.IsNullOrWhiteSpace(keyword))
         {
             var lower = keyword.ToLower();
@@ -36,6 +31,10 @@ public class ProductRepository : IProductRepository
                 p.ProductCode.ToLower().Contains(lower) ||
                 p.Name.ToLower().Contains(lower));
         }
+
+        // 仕入分類コードフィルター
+        if (!string.IsNullOrWhiteSpace(categoryCode))
+            query = query.Where(p => p.CategoryCode == categoryCode);
 
         return await query.OrderBy(p => p.ProductCode).ToListAsync();
     }

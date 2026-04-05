@@ -45,3 +45,31 @@ export async function updateSupplierPrice(priceId: number, dto: UpdateSupplierPr
   )
   return res.data.data
 }
+
+export interface SupplierInfo {
+  id: number
+  name: string
+}
+
+export interface SupplierOrderPreviewItem {
+  productId: number
+  productCode: string
+  productName: string
+  unitPrice: number
+  currency: string
+  leadTimeDays: number
+  moq: number
+  boxQty: number
+  averageShipment: number
+  safetyStock: number
+}
+
+export async function getAllSuppliers(): Promise<SupplierInfo[]> {
+  const res = await client.get<ApiResponse<SupplierInfo[]>>('/suppliers')
+  return res.data.data
+}
+
+export async function getSupplierOrderPreview(supplierId: number): Promise<SupplierOrderPreviewItem[]> {
+  const res = await client.get<ApiResponse<SupplierOrderPreviewItem[]>>(`/suppliers/${supplierId}/order-preview`)
+  return res.data.data
+}

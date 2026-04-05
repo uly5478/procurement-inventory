@@ -14,7 +14,26 @@ public class DemandForecastDto
     public DateTime GeneratedAt { get; set; }
 }
 
-/// <summary>單一產品需求預測詳情 DTO（含歷史出貨量）</summary>
+/// <summary>月別出荷詳細 DTO（平均超過月のクリック用）</summary>
+public class MonthlyShipmentDetailDto
+{
+    public int Year { get; set; }
+    public int Month { get; set; }
+    public int TotalShipped { get; set; }
+    public decimal Average { get; set; }
+    public bool AboveAverage { get; set; }
+    public List<ShipmentTransactionDto> Transactions { get; set; } = new();
+}
+
+/// <summary>出荷トランザクション詳細 DTO</summary>
+public class ShipmentTransactionDto
+{
+    public int Id { get; set; }
+    public DateTime TransactionDate { get; set; }
+    public int Quantity { get; set; }
+    public string OperatorAccount { get; set; } = string.Empty;
+    public string? Remark { get; set; }
+}
 public class ProductForecastDetailDto
 {
     public int ProductId { get; set; }

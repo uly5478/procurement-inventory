@@ -120,6 +120,13 @@ builder.Services.AddScoped<IExcelExportService, ExcelExportService>();
 builder.Services.AddScoped<AuditService>();
 builder.Services.AddHostedService<AuditBackgroundService>();
 builder.Services.AddScoped<IDemandForecastService, DemandForecastService>();
+// NEW: Monthly shipment, warehouse stock, monthly inventory
+builder.Services.AddScoped<IMonthlyShipmentRepository, MonthlyShipmentRepository>();
+builder.Services.AddScoped<IMonthlyShipmentService, MonthlyShipmentService>();
+builder.Services.AddScoped<IWarehouseStockRepository, WarehouseStockRepository>();
+builder.Services.AddScoped<IWarehouseStockService, WarehouseStockService>();
+builder.Services.AddScoped<IMonthlyInventoryRepository, MonthlyInventoryRepository>();
+builder.Services.AddScoped<IMonthlyInventoryService, MonthlyInventoryService>();
 
 var app = builder.Build();
 
