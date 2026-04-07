@@ -25,3 +25,10 @@ export async function updateSettings(dto: { defaultTurnoverMonths: number }) {
   const res = await client.put<ApiResponse<ProcurementSettings>>('/procurement/settings', dto)
   return res.data.data
 }
+
+export async function resetOverride(productId: number) {
+  const res = await client.delete<ApiResponse<ProcurementSuggestion>>(
+    `/procurement/suggestions/${productId}/override`
+  )
+  return res.data.data
+}

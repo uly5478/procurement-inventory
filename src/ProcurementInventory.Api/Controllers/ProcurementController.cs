@@ -44,6 +44,14 @@ public class ProcurementController : ControllerBase
         return Ok(ApiResponse<ProcurementSuggestionDto>.Ok(suggestion));
     }
 
+    /// <summary>手動覆寫をリセットしてシステム計算値に戻す</summary>
+    [HttpDelete("suggestions/{productId:int}/override")]
+    public async Task<ActionResult<ApiResponse<ProcurementSuggestionDto>>> ResetOverride(int productId)
+    {
+        var suggestion = await _procurementService.ResetOverrideAsync(productId);
+        return Ok(ApiResponse<ProcurementSuggestionDto>.Ok(suggestion));
+    }
+
     /// <summary>
     /// 取得採購設定（需求 3.2, 3.3）
     /// </summary>

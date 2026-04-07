@@ -103,6 +103,26 @@ public class ProcurementCalculatorService : IProcurementCalculatorService
     }
 
     /// <inheritdoc/>
+    public async Task<ProcurementSuggestionDto> ResetOverrideAsync(int productId)
+    {
+        var existing = await _repo.GetSuggestionByProductIdAsync(productId);
+        if (existing != null)
+        {
+            existing.ManualOverrideQty = null;
+            existing.IsManualOverride = false;
+            existing.CalculatedAt = DateTime.UtcNow;
+            await _repo.UpsertSuggestionAsync(existing);
+        }
+
+        var settings = await _repo.GetSettingsAsync();
+        var products = await _repo.GetAllProductsWithInventoryAsync();
+        var product = products.FirstOrDefault(p => p.Id == productId)
+            ?? throw new KeyNotFoundException($"找不到產品 Id={productId}");
+
+        return await CalculateSuggestionAsync(product, settings.DefaultTurnoverMonths);
+    }
+
+    /// <inheritdoc/>
     public async Task<ProcurementSettingsDto> GetSettingsAsync()
     {
         var settings = await _repo.GetSettingsAsync();

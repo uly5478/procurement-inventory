@@ -12,11 +12,11 @@ import {
   Tag,
   Radio,
 } from 'antd'
-import { WarningOutlined, CheckOutlined, CloseOutlined, ShoppingCartOutlined } from '@ant-design/icons'
+import { WarningOutlined, CheckOutlined, CloseOutlined, ShoppingCartOutlined, UndoOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import { useNavigate } from 'react-router-dom'
-import { getSuggestions, manualOverride, getSettings, updateSettings } from '../../api/procurement'
+import { getSuggestions, manualOverride, getSettings, updateSettings, resetOverride } from '../../api/procurement'
 import { getProductSuppliers } from '../../api/suppliers'
 import { createPurchaseOrder } from '../../api/purchaseOrders'
 import type { ProcurementSuggestion, ProcurementSettings } from '../../types'
@@ -76,13 +76,13 @@ function calcMonthlyOrders(
   effectiveStock: number,
   moq: number,
   boxQty: number,
-): { label: string; qty: number }[] {
-  const result: { label: string; qty: number }[] = []
+): { label: string; qty: number; estimatedStock: number }[] {
+  const result: { label: string; qty: number; estimatedStock: number }[] = []
   let stock = effectiveStock
   for (let i = 0; i < 6; i++) {
     if (i > 0) stock = Math.max(0, stock - avg)
     const qty = calcOrderQty(avg, turnover, leadTimeDays, stock, moq, boxQty)
-    result.push({ label: dayjs().add(i, 'month').format('YYYY/MM'), qty })
+    result.push({ label: dayjs().add(i, 'month').format('YYYY/MM'), qty, estimatedStock: Math.round(stock) })
     if (qty > 0) stock += qty
   }
   return result
@@ -147,6 +147,16 @@ export default function SuggestionsPage() {
       fetchSuggestions()
     } catch {
       message.error('更新に失敗しました')
+    }
+  }
+
+  async function handleReset(productId: number) {
+    try {
+      await resetOverride(productId)
+      message.success('システム計算値にリセットしました')
+      fetchSuggestions()
+    } catch {
+      message.error('リセットに失敗しました')
     }
   }
 
@@ -215,21 +225,31 @@ export default function SuggestionsPage() {
     }
   }
 
-  /** 選択月・回転率で再計算した発注数を取得 */
+  /** 選択月・回転率で再計算した発注数を取得（手動変更がある場合はそちらを優先） */
   function getCalcOrderQty(record: ProcurementSuggestion): number {
-    const avg = record.sixMonthAvgShipment
-    const leadTimeDays = record.recommendedLeadTimeDays ?? 60
-    const effectiveStock = record.currentStock  // currentStock = totalWarehouseStock - unallocated
-    const orders = calcMonthlyOrders(avg, turnover, leadTimeDays, effectiveStock, record.moq, record.boxQty)
-    const found = orders.find(o => o.label === selectedMonth)
-    return found ? found.qty : 0
+    if (record.isManualOverride && record.manualOverrideQty !== undefined) {
+      return record.manualOverrideQty
+    }
+    return getMonthlyCalcQty(record, selectedMonth)
   }
 
-  /** 6ヶ月分の再計算発注数 */
+  /** 6ヶ月分の発注数 — 回転率が変わった場合のみ全月再計算、それ以外はサーバー値を使用 */
   function getMonthlyCalcQty(record: ProcurementSuggestion, label: string): number {
     const avg = record.sixMonthAvgShipment
     const leadTimeDays = record.recommendedLeadTimeDays ?? 60
     const effectiveStock = record.currentStock
+
+    // サーバーのデフォルト回転率と現在の回転率が同じ場合はサーバー値をそのまま使用
+    // （回転率が変わった場合のみ全月再計算）
+    const serverVal = record.monthlyOrderSuggestions?.find(s => s.label === label)
+    const serverTurnover = record.turnoverMonths ?? 2.5
+
+    if (Math.abs(turnover - serverTurnover) < 0.01) {
+      // 回転率変更なし → サーバー値をそのまま返す
+      return serverVal ? serverVal.suggestedQty : 0
+    }
+
+    // 回転率変更あり → 全月を新しい回転率で再計算
     const orders = calcMonthlyOrders(avg, turnover, leadTimeDays, effectiveStock, record.moq, record.boxQty)
     const found = orders.find(o => o.label === label)
     return found ? found.qty : 0
@@ -401,12 +421,20 @@ export default function SuggestionsPage() {
     {
       title: '操作',
       key: 'actions',
-      width: 130,
+      width: 170,
       fixed: 'right',
       render: (_, record) =>
         editingId === record.productId ? null : (
           <Space size={4}>
             <Button size="small" onClick={() => startEdit(record)}>手動変更</Button>
+            <Button
+              size="small"
+              icon={<UndoOutlined />}
+              onClick={() => handleReset(record.productId)}
+              title="システム計算値に戻す"
+            >
+              リセット
+            </Button>
             <Button
               size="small"
               type="primary"

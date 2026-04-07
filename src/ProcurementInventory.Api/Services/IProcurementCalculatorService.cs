@@ -22,6 +22,9 @@ public interface IProcurementCalculatorService
     /// </summary>
     Task<ProcurementSuggestionDto> ManualOverrideAsync(int productId, int qty);
 
+    /// <summary>手動覆寫をリセットしてシステム計算値に戻す</summary>
+    Task<ProcurementSuggestionDto> ResetOverrideAsync(int productId);
+
     /// <summary>取得採購設定</summary>
     Task<ProcurementSettingsDto> GetSettingsAsync();
 
