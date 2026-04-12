@@ -69,21 +69,33 @@ function calcOrderQty(
   return qty
 }
 
-/** 6ヶ月分の発注計画を再計算 */
-function calcMonthlyOrders(
+/** 選択月以降の発注計画のみ再計算（選択月より前はサーバー値を維持） */
+function calcMonthlyOrdersFromSelected(
   avg: number,
   turnover: number,
   leadTimeDays: number,
-  effectiveStock: number,
+  serverOrders: { label: string; qty: number; estimatedStock: number }[],
+  selectedMonthLabel: string,
   moq: number,
   boxQty: number,
 ): { label: string; qty: number; estimatedStock: number }[] {
-  const result: { label: string; qty: number; estimatedStock: number }[] = []
-  let stock = effectiveStock
-  for (let i = 0; i < 6; i++) {
-    if (i > 0) stock = Math.max(0, stock - avg)
+  const selectedIndex = serverOrders.findIndex(o => o.label === selectedMonthLabel)
+  if (selectedIndex < 0) return serverOrders
+
+  // 選択月より前はサーバー値をそのまま使用
+  const result = serverOrders.slice(0, selectedIndex).map(o => ({ ...o }))
+
+  // 選択月以降の開始在庫 = 選択月の月初在庫（サーバー値）
+  let stock = serverOrders[selectedIndex].estimatedStock
+
+  for (let i = selectedIndex; i < 6; i++) {
+    if (i > selectedIndex) stock = Math.max(0, stock - avg)
     const qty = calcOrderQty(avg, turnover, leadTimeDays, stock, moq, boxQty)
-    result.push({ label: dayjs().add(i, 'month').format('YYYY/MM'), qty, estimatedStock: Math.round(stock) })
+    result.push({
+      label: serverOrders[i].label,
+      qty,
+      estimatedStock: Math.round(stock)
+    })
     if (qty > 0) stock += qty
   }
   return result
@@ -235,14 +247,12 @@ export default function SuggestionsPage() {
     return getMonthlyCalcQty(record, selectedMonth)
   }
 
-  /** 6ヶ月分の発注数 — 回転率が変わった場合のみ全月再計算、それ以外はサーバー値を使用 */
+  /** 6ヶ月分の発注数 — 回転率が変わった場合、選択月以降のみ再計算 */
   function getMonthlyCalcQty(record: ProcurementSuggestion, label: string): number {
     const avg = record.sixMonthAvgShipment
     const leadTimeDays = record.recommendedLeadTimeDays ?? 60
-    const effectiveStock = record.currentStock
 
     // サーバーのデフォルト回転率と現在の回転率が同じ場合はサーバー値をそのまま使用
-    // （回転率が変わった場合のみ全月再計算）
     const serverVal = record.monthlyOrderSuggestions?.find(s => s.label === label)
     const serverTurnover = record.turnoverMonths ?? 2.5
 
@@ -251,8 +261,13 @@ export default function SuggestionsPage() {
       return serverVal ? serverVal.suggestedQty : 0
     }
 
-    // 回転率変更あり → 全月を新しい回転率で再計算
-    const orders = calcMonthlyOrders(avg, turnover, leadTimeDays, effectiveStock, record.moq, record.boxQty)
+    // 回転率変更あり → 選択月以降のみ新しい回転率で再計算
+    const serverOrders = record.monthlyOrderSuggestions?.map(s => ({
+      label: s.label,
+      qty: s.suggestedQty,
+      estimatedStock: s.estimatedStock ?? 0
+    })) ?? []
+    const orders = calcMonthlyOrdersFromSelected(avg, turnover, leadTimeDays, serverOrders, selectedMonth, record.moq, record.boxQty)
     const found = orders.find(o => o.label === label)
     return found ? found.qty : 0
   }

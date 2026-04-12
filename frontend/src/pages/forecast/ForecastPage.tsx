@@ -217,18 +217,6 @@ export default function ForecastPage() {
       render: (_, r) => `${r.forecastYear}/${String(r.forecastMonth).padStart(2, '0')}`,
     },
     {
-      title: (
-        <Tooltip title="加重移動平均（WMA）で計算。最新月ほど重みが大きく、古い月ほど小さい。12ヶ月データの場合: 最新月×12 + 前月×11 + ... の加重平均">
-          <span style={{ borderBottom: '1px dashed #999', cursor: 'help' }}>予測需要数 ℹ</span>
-        </Tooltip>
-      ),
-      dataIndex: 'forecastQty',
-      key: 'forecastQty',
-      width: 120,
-      align: 'right',
-      render: (v: number) => <Text strong style={{ color: '#52c41a' }}>{Math.round(v).toLocaleString()}</Text>,
-    },
-    {
       title: '信頼区間', key: 'confidence', width: 130, align: 'right',
       render: (_, r) => <Text type="secondary">{Math.round(r.confidenceLower)} ~ {Math.round(r.confidenceUpper)}</Text>,
     },
