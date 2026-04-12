@@ -9,7 +9,6 @@ import {
   Tag,
   Space,
   Descriptions,
-  Tooltip,
 } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import {
