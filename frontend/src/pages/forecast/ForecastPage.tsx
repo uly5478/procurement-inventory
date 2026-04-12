@@ -31,6 +31,7 @@ import { getAllForecasts, getProductForecast, getMonthlyDetail } from '../../api
 import type { DemandForecastDto, ProductForecastDetail, MonthlyShipmentDetailDto } from '../../api/forecast'
 import { getInventoryOverview } from '../../api/inventory'
 import type { InventoryOverview } from '../../api/inventory'
+import useTurnoverStore from '../../store/turnoverStore'
 
 const { Text, Title } = Typography
 
@@ -38,6 +39,45 @@ const SIX_MONTHS = Array.from({ length: 6 }, (_, i) => {
   const d = dayjs().add(i, 'month')
   return { label: d.format('YYYY/MM'), idx: i }
 })
+
+/** 回転率・リードタイムから発注数を計算（SuggestionsPageと同じロジック） */
+function calcOrderQty(
+  avg: number,
+  turnover: number,
+  leadTimeDays: number,
+  effectiveStock: number,
+  moq: number,
+  boxQty: number,
+): number {
+  const leadTimeMonths = leadTimeDays / 30
+  const needed = avg * (turnover + leadTimeMonths) - effectiveStock
+  if (needed <= 0) return 0
+  let qty = Math.ceil(needed)
+  if (qty < moq) qty = moq
+  const bq = boxQty > 0 ? boxQty : 1
+  if (bq > 1 && qty % bq !== 0) qty = Math.floor(qty / bq + 1) * bq
+  return qty
+}
+
+/** 6ヶ月分の発注計画を再計算（SuggestionsPageと同じロジック） */
+function calcMonthlyOrders(
+  avg: number,
+  turnover: number,
+  leadTimeDays: number,
+  effectiveStock: number,
+  moq: number,
+  boxQty: number,
+): { label: string; qty: number; estimatedStock: number }[] {
+  const result: { label: string; qty: number; estimatedStock: number }[] = []
+  let stock = effectiveStock
+  for (let i = 0; i < 6; i++) {
+    if (i > 0) stock = Math.max(0, stock - avg)
+    const qty = calcOrderQty(avg, turnover, leadTimeDays, stock, moq, boxQty)
+    result.push({ label: dayjs().add(i, 'month').format('YYYY/MM'), qty, estimatedStock: Math.round(stock) })
+    if (qty > 0) stock += qty
+  }
+  return result
+}
 
 // カスタム Dot: 平均超過点を赤くする
 function CustomDot(props: {
@@ -73,6 +113,9 @@ export default function ForecastPage() {
   const [detail, setDetail] = useState<ProductForecastDetail | null>(null)
   const [detailLoading, setDetailLoading] = useState(false)
   const [currentProductId, setCurrentProductId] = useState<number | null>(null)
+
+  // Zustandストアから回転率を取得
+  const { turnover } = useTurnoverStore()
 
   // 月別詳細ポップアップ
   const [monthlyDetail, setMonthlyDetail] = useState<MonthlyShipmentDetailDto | null>(null)
@@ -129,9 +172,23 @@ export default function ForecastPage() {
 
   function getOrderQty(productId: number, label: string): number | null {
     const inv = inventoryData.find(d => d.productId === productId)
-    if (!inv?.monthlyOrderSuggestions) return null
-    const found = inv.monthlyOrderSuggestions.find(s => s.label === label)
-    return found ? found.suggestedQty : null
+    if (!inv) return null
+    
+    // 現在の回転率で再計算
+    const forecast = forecasts.find(f => f.productId === productId)
+    if (!forecast) return null
+    
+    // 在庫データから必要な情報を取得
+    const avg = inv.sixMonthAvgShipment ?? 0
+    const leadTimeDays = inv.recommendedLeadTimeDays ?? 60
+    const effectiveStock = inv.currentStock ?? 0
+    const moq = inv.moq ?? 0
+    const boxQty = inv.boxQty ?? 1
+    
+    // 6ヶ月分の発注計画を再計算
+    const orders = calcMonthlyOrders(avg, turnover, leadTimeDays, effectiveStock, moq, boxQty)
+    const found = orders.find(o => o.label === label)
+    return found ? found.qty : null
   }
 
   const monthlyOrderColumns: ColumnsType<DemandForecastDto> = SIX_MONTHS.map(({ label, idx }) => ({
@@ -212,13 +269,38 @@ export default function ForecastPage() {
   }
 
   const detailOrderSuggestions = detail
-    ? inventoryData.find(d => d.productId === detail.productId)?.monthlyOrderSuggestions ?? []
+    ? (() => {
+        const inv = inventoryData.find(d => d.productId === detail.productId)
+        if (!inv) return []
+        
+        const avg = inv.sixMonthAvgShipment ?? 0
+        const leadTimeDays = inv.recommendedLeadTimeDays ?? 60
+        const effectiveStock = inv.currentStock ?? 0
+        const moq = inv.moq ?? 0
+        const boxQty = inv.boxQty ?? 1
+        
+        // 現在の回転率で6ヶ月分を再計算
+        return calcMonthlyOrders(avg, turnover, leadTimeDays, effectiveStock, moq, boxQty).map(o => ({
+          label: o.label,
+          suggestedQty: o.qty,
+          estimatedStock: o.estimatedStock,
+        }))
+      })()
     : []
 
   const chartInfo = detail ? buildChartData(detail) : null
 
   return (
     <div style={{ padding: 24 }}>
+      {/* 回転率表示 */}
+      <div style={{ marginBottom: 12, padding: '8px 12px', background: '#e6f4ff', borderRadius: 6, border: '1px solid #91caff' }}>
+        <Space>
+          <Text strong>在庫回転率:</Text>
+          <Text style={{ fontSize: 16, color: '#1677ff' }}>{turnover}ヶ月</Text>
+          <Text type="secondary" style={{ fontSize: 12 }}>（調達提案ページで設定された値を使用）</Text>
+        </Space>
+      </div>
+
       {/* 計算方法の説明 */}
       <div style={{ marginBottom: 12, padding: '8px 12px', background: '#f0f5ff', borderRadius: 6, fontSize: 13, color: '#555' }}>
         <Text strong>予測需要数の計算方法：</Text>

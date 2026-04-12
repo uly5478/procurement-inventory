@@ -301,6 +301,11 @@ public class InventoryService : IInventoryService
                 SafetyStock = safetyStock,
                 TurnoverMonths = turnoverMonths,
                 LeadTimeMonths = leadTimeMonths,
+                // ForecastPage 計算用
+                CurrentStock = effectiveStock,
+                RecommendedLeadTimeDays = currentPrices.Count > 0 ? currentPrices[0].LeadTimeDays : null,
+                Moq = record.Product?.MOQ ?? 0,
+                BoxQty = record.Product?.BoxQty ?? 1,
                 MonthlyOrderSuggestions = suggestions,
             });
         }

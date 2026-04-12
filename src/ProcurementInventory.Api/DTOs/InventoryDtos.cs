@@ -83,6 +83,16 @@ public class InventoryOverviewDto
     /// <summary>リードタイム月数（推奨仕入先の LeadTimeDays / 30）</summary>
     public decimal LeadTimeMonths { get; set; }
 
+    // ForecastPage 計算用に追加
+    /// <summary>有効在庫（総倉庫在庫 - 未割当数量）</summary>
+    public int CurrentStock { get; set; }
+    /// <summary>推奨仕入先のリードタイム（日数）</summary>
+    public int? RecommendedLeadTimeDays { get; set; }
+    /// <summary>最小発注数量</summary>
+    public int Moq { get; set; }
+    /// <summary>箱入数</summary>
+    public int BoxQty { get; set; }
+
     /// <summary>半年分の月次発注提案（今月〜6ヶ月先）</summary>
     public List<MonthlyOrderSuggestionDto> MonthlyOrderSuggestions { get; set; } = new();
 }
@@ -103,8 +113,6 @@ public class MonthlyOrderSuggestionDto
 /// <summary>庫存總覽拡張 DTO（Excel エクスポート用）</summary>
 public class InventoryOverviewExtendedDto : InventoryOverviewDto
 {
-    public int BoxQty { get; set; }
-    public int Moq { get; set; }
     public decimal AverageShipment { get; set; }
     public List<SupplierInfoForExportDto> Suppliers { get; set; } = new();
     public Dictionary<int, int> MonthlyShipments { get; set; } = new(); // Month (1-12) -> Qty

@@ -36,3 +36,6 @@ logs/
 Thumbs.db
 
 nul
+Qwen.md
+.qwen
+frontend/src/test

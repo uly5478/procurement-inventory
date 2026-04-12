@@ -20,6 +20,7 @@ import { getSuggestions, manualOverride, getSettings, updateSettings, resetOverr
 import { getProductSuppliers } from '../../api/suppliers'
 import { createPurchaseOrder } from '../../api/purchaseOrders'
 import type { ProcurementSuggestion, ProcurementSettings } from '../../types'
+import useTurnoverStore from '../../store/turnoverStore'
 
 const { Text } = Typography
 
@@ -94,8 +95,8 @@ export default function SuggestionsPage() {
   const [, setSettings] = useState<ProcurementSettings | null>(null)
   const navigate = useNavigate()
 
-  // 選択中の回転率（フロントエンドで管理）
-  const [turnover, setTurnover] = useState<number>(2.5)
+  // 選択中の回転率（Zustandストアで管理）
+  const { turnover, setTurnover } = useTurnoverStore()
   // 選択中の発注月
   const [selectedMonth, setSelectedMonth] = useState<string>(SIX_MONTHS[0].label)
 
@@ -121,7 +122,8 @@ export default function SuggestionsPage() {
     try {
       const data = await getSettings()
       setSettings(data)
-      setTurnover(data.defaultTurnoverMonths)
+      // 使用新的初始化方法，避免覆蓋使用者選擇的值
+      useTurnoverStore.getState().initializeFromBackend(data.defaultTurnoverMonths)
     } catch {
       message.error('設定の読み込みに失敗しました')
     }

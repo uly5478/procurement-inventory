@@ -20,6 +20,11 @@ export interface InventoryOverview {
   safetyStock: number
   turnoverMonths: number
   leadTimeMonths: number
+  // ForecastPage 計算用
+  currentStock: number
+  recommendedLeadTimeDays?: number
+  moq: number
+  boxQty: number
   // 半年分の月次発注提案
   monthlyOrderSuggestions?: MonthlyOrderSuggestion[]
 }
